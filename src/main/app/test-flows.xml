@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <sub-flow name="createContactFlow" doc:name="createContactFlow">
+        <sfdc:create config-ref="SalesforceA" type="Contact" doc:name="Salesforce">
+            <sfdc:objects ref="#[payload]"/>
+        </sfdc:create>
+    </sub-flow>
+    <sub-flow name="retrieveContactFlow" doc:name="retrieveContactFlow">
+        <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Email FROM Contact WHERE (Email = '#[payload['Email']]' AND FirstName= '#[payload['FirstName']]' AND LastName= '#[payload['LastName']]' )" doc:name="Salesforce"/>
+    </sub-flow>
+    <sub-flow name="deleteContactFromAFlow" doc:name="deleteContactFromAFlow">
+        <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
+            <sfdc:ids ref="#[payload]"/>
+        </sfdc:delete>
+    </sub-flow>
+    <sub-flow name="deleteContactFromBFlow" doc:name="deleteContactFromBFlow">
+        <sfdc:delete config-ref="SalesforceB" doc:name="Salesforce">
+            <sfdc:ids ref="#[payload]"/>
+        </sfdc:delete>
+    </sub-flow>
+</mule>
