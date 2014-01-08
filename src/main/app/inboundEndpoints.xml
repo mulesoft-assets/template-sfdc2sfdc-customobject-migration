@@ -4,7 +4,7 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
     <flow name="inboundFlow" doc:name="inboundFlow" processingStrategy="synchronous">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="synccontacts" doc:name="Start Synchronization"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="synccustomobjects" doc:name="Start Synchronization"/>
         <flow-ref name="mainFlow" doc:name="mainFlow" doc:description="Report generation"/>
     </flow>
 </mule>

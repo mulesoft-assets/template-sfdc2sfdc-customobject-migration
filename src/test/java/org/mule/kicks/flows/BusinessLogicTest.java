@@ -30,9 +30,10 @@ public class BusinessLogicTest extends FunctionalMunitSuite {
 
 	@Ignore
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testGatherDataFlow() throws MuleException, Exception {
 
-		ConsumerIterator<Map<String, String>> queryResult = Mockito.mock(ConsumerIterator.class);
+        ConsumerIterator<Map<String, String>> queryResult = Mockito.mock(ConsumerIterator.class);
 		Mockito.when(queryResult.size()).thenReturn(0);
 
 		whenMessageProcessor("query").ofNamespace("sfdc").thenReturn(muleMessageWithPayload(queryResult));

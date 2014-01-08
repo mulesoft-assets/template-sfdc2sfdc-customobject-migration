@@ -21,7 +21,7 @@ import org.mule.transport.NullPayload;
  * 
  * @author damiansima
  */
-public class SFDCContactFilter extends AbstractMessageTransformer {
+public class SFDCCustomObjectFilter extends AbstractMessageTransformer {
 	private static final String ID_FIELD = "Id";
 	private static final String FIELD_TYPE = "type";
 	private static final String CONTACT_IN_COMPANY_B = "contactInB";

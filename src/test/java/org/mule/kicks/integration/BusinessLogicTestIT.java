@@ -26,91 +26,90 @@ import com.sforce.soap.partner.SaveResult;
  */
 public class BusinessLogicTestIT extends AbstractKickTestCase {
 
-	private static SubflowInterceptingChainLifecycleWrapper checkContactflow;
-	private static List<Map<String, String>> createdContacts = new ArrayList<Map<String, String>>();
+	private static SubflowInterceptingChainLifecycleWrapper checkCustomObjectflow;
+	private static List<Map<String, String>> createdCustomObjects = new ArrayList<Map<String, String>>();
 
 	@Before
 	@SuppressWarnings("unchecked")
 	public void setUp() throws Exception {
-		checkContactflow = getSubFlow("retrieveContactFlow");
-		checkContactflow.initialise();
+		checkCustomObjectflow = getSubFlow("retrieveCustomObjectFlow");
+		checkCustomObjectflow.initialise();
 
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createContactFlow");
+		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createCustomObjectFlow");
 		flow.initialise();
 
-		// This contact should not be sync
-		Map<String, String> contact = createContact("A", 0);
-		contact.put("Email", "");
-		createdContacts.add(contact);
+		// This custom object should not be sync
+		Map<String, String> customObject = createCustomObject("A", 0);
+		customObject.put("Email", "");
+		createdCustomObjects.add(customObject);
 
-		// This contact should not be sync
-		contact = createContact("A", 1);
-		contact.put("MailingCountry", "ARG");
-		createdContacts.add(contact);
+		// This custom object should not be sync
+		customObject = createCustomObject("A", 1);
+		customObject.put("MailingCountry", "ARG");
+		createdCustomObjects.add(customObject);
 
-		// This contact should BE sync
-		contact = createContact("A", 2);
-		createdContacts.add(contact);
+		// This custom object should BE sync
+		customObject = createCustomObject("A", 2);
+		createdCustomObjects.add(customObject);
 
-		MuleEvent event = flow.process(getTestEvent(createdContacts, MessageExchangePattern.REQUEST_RESPONSE));
+		MuleEvent event = flow.process(getTestEvent(createdCustomObjects, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> results = (List<SaveResult>) event.getMessage().getPayload();
 		for (int i = 0; i < results.size(); i++) {
-			createdContacts.get(i).put("Id", results.get(i).getId());
+			createdCustomObjects.get(i).put("Id", results.get(i).getId());
 		}
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		// Delete the created contacts in A
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteContactFromAFlow");
+		// Delete the created custom objects in A
+		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteCustomObjectFromAFlow");
 		flow.initialise();
 
 		List<String> idList = new ArrayList<String>();
-		for (Map<String, String> c : createdContacts) {
+		for (Map<String, String> c : createdCustomObjects) {
 			idList.add(c.get("Id"));
 		}
 		flow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
 
-		// Delete the created contacts in B
-		flow = getSubFlow("deleteContactFromBFlow");
+		// Delete the created custom objects in B
+		flow = getSubFlow("deleteCustomObjectFromBFlow");
 		flow.initialise();
 		idList.clear();
-		for (Map<String, String> c : createdContacts) {
-			Map<String, String> contact = invokeRetrieveContactFlow(checkContactflow, c);
-			if (contact != null) {
-				idList.add(contact.get("Id"));
+		for (Map<String, String> c : createdCustomObjects) {
+			Map<String, String> customObject = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, c);
+			if (customObject != null) {
+				idList.add(customObject.get("Id"));
 			}
 		}
 		flow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testMainFlow() throws Exception {
 		Flow flow = getFlow("mainFlow");
 		flow.process(getTestEvent("", MessageExchangePattern.REQUEST_RESPONSE));
 
-		Assert.assertEquals("The contact should not have been sync", null,
-				invokeRetrieveContactFlow(checkContactflow, createdContacts.get(0)));
+		Assert.assertEquals("The custom object should not have been sync", null,
+				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(0)));
 
-		Assert.assertEquals("The contact should not have been sync", null,
-				invokeRetrieveContactFlow(checkContactflow, createdContacts.get(1)));
+		Assert.assertEquals("The custom object should not have been sync", null,
+				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(1)));
 
-		Map<String, String> payload = invokeRetrieveContactFlow(checkContactflow, createdContacts.get(2));
-		Assert.assertEquals("The contact should have been sync", createdContacts.get(2).get("Email"),
+		Map<String, String> payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(2));
+		Assert.assertEquals("The custom object should have been sync", createdCustomObjects.get(2).get("Email"),
 				payload.get("Email"));
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, String> invokeRetrieveContactFlow(SubflowInterceptingChainLifecycleWrapper flow,
-			Map<String, String> contact) throws Exception {
-		Map<String, String> contactMap = new HashMap<String, String>();
+	private Map<String, String> invokeRetrieveCustomObjectFlow(SubflowInterceptingChainLifecycleWrapper flow,
+			Map<String, String> customObject) throws Exception {
+		Map<String, String> customObjectMap = new HashMap<String, String>();
 
-		contactMap.put("Email", contact.get("Email"));
-		contactMap.put("FirstName", contact.get("FirstName"));
-		contactMap.put("LastName", contact.get("LastName"));
+		customObjectMap.put("Email", customObject.get("Email"));
+		customObjectMap.put("FirstName", customObject.get("FirstName"));
+		customObjectMap.put("LastName", customObject.get("LastName"));
 
-		MuleEvent event = flow.process(getTestEvent(contactMap, MessageExchangePattern.REQUEST_RESPONSE));
+		MuleEvent event = flow.process(getTestEvent(customObjectMap, MessageExchangePattern.REQUEST_RESPONSE));
 		Object payload = event.getMessage().getPayload();
 		if (payload instanceof NullPayload) {
 			return null;
@@ -119,21 +118,21 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		}
 	}
 
-	private Map<String, String> createContact(String orgId, int sequence) {
-		Map<String, String> contact = new HashMap<String, String>();
+	private Map<String, String> createCustomObject(String orgId, int sequence) {
+		Map<String, String> customObject = new HashMap<String, String>();
 
-		contact.put("FirstName", "FirstName_" + sequence);
-		contact.put("LastName", "LastName_" + sequence);
-		contact.put("Email", "some.email." + sequence + "@fakemail.com");
-		contact.put("Description", "Some fake description");
-		contact.put("MailingCity", "Denver");
-		contact.put("MailingCountry", "USA");
-		contact.put("MobilePhone", "123456789");
-		contact.put("Department", "department_" + sequence + "_" + orgId);
-		contact.put("Phone", "123456789");
-		contact.put("Title", "Dr");
+		customObject.put("FirstName", "FirstName_" + sequence);
+		customObject.put("LastName", "LastName_" + sequence);
+		customObject.put("Email", "some.email." + sequence + "@fakemail.com");
+		customObject.put("Description", "Some fake description");
+		customObject.put("MailingCity", "Denver");
+		customObject.put("MailingCountry", "USA");
+		customObject.put("MobilePhone", "123456789");
+		customObject.put("Department", "department_" + sequence + "_" + orgId);
+		customObject.put("Phone", "123456789");
+		customObject.put("Title", "Dr");
 
-		return contact;
+		return customObject;
 	}
 
 }
