@@ -51,3 +51,8 @@ local.properties
 ./flows/
 target/
 **/*.mflow
+
+# ------------------------------------------------------------------------ #
+# Added ignore because of https://www.mulesoft.org/jira/browse/STUDIO-4317 #
+# ------------------------------------------------------------------------ #
+./src/main/app/test-flows.xml
