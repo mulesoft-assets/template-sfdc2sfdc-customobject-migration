@@ -23,7 +23,6 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         <foreach doc:name="For Each" batchSize="${page.size}">
             <flow-ref name="filterFlow" doc:name="filterFlow"/>
             <expression-filter expression="#[!payload.isEmpty()]" doc:name="Filter if Payload is empty"/>
-            <logger level="INFO" message="Custom objects to be synced #[payload:]" />
             <sfdc:upsert-bulk config-ref="SalesforceB" type="MusicAlbum__c" doc:name="Upsert custom objects in org B" externalIdFieldName="Id">
                 <sfdc:objects ref="#[payload]"/>
             </sfdc:upsert-bulk>

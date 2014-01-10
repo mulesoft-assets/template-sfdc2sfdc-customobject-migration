@@ -10,10 +10,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         </sfdc:create>
     </sub-flow>
     <sub-flow name="retrieveCustomObjectFlow" doc:name="retrieveCustomObjectFlow">
-<logger level="INFO" message="payload name = #[payload['Name']]" />
         <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name FROM MusicAlbum__c WHERE Name = '#[payload['Name']]'" doc:name="Salesforce"/>
-<logger level="INFO" message="The payload is #[payload]" />
-
     </sub-flow>
     <sub-flow name="deleteCustomObjectFromAFlow" doc:name="deleteCustomObjectFromAFlow">
         <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">

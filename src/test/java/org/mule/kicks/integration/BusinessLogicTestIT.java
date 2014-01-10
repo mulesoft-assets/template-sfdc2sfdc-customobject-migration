@@ -39,19 +39,25 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		flow.initialise();
 
 		// This custom object should not be sync
-		Map<String, String> customObject = createCustomObject("A", 0);
-		customObject.put("Name", "");
-		createdCustomObjects.add(customObject);
+		createdCustomObjects.add(aCustomObject()
+                                    .withProperty("Name", "Name_" + 0)
+                                    .withProperty("interpreter__c", "interpreter__c_" + 0)
+                                    .withProperty("year__c", String.valueOf(1950 + 0))
+                                    .build());
 
 		// This custom object should not be sync
-		customObject = createCustomObject("A", 1);
-		customObject.put("interpreter__c", "Emir Kusturica");
-		createdCustomObjects.add(customObject);
+		createdCustomObjects.add(aCustomObject()
+                                     .withProperty("Name", "Name_" + 1)
+                                     .withProperty("interpreter__c", "interpreter__c_" + 1)
+                                     .withProperty("year__c", String.valueOf(1950 + 1))
+                                     .build());
 
 		// This custom object should BE sync
-		customObject = createCustomObject("A", 2);
-		customObject.put("year__c", "2014");
-		createdCustomObjects.add(customObject);
+		createdCustomObjects.add(aCustomObject()
+                                     .withProperty("Name", "Name_" + 2)
+                                     .withProperty("interpreter__c", "interpreter__c_" + 2)
+                                     .withProperty("year__c", "2014")
+                                     .build());
 
 		MuleEvent event = flow.process(getTestEvent(createdCustomObjects, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> results = (List<SaveResult>) event.getMessage().getPayload();
@@ -99,11 +105,6 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 
 		Map<String, String> payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(2));
 
-		System.out.println("created(2) = " + createdCustomObjects.get(2));
-		System.out.println("created(2).name = " + createdCustomObjects.get(2).get("Name"));
-		System.out.println("payload = " + payload);
-		System.out.println("payload.name = " + payload.get("Name"));
-		
 		Assert.assertEquals("The custom object should have been sync", 
 		        createdCustomObjects.get(2).get("Name"),
 				payload.get("Name"));
@@ -124,15 +125,24 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 			return (Map<String, String>) payload;
 		}
 	}
-
-	private Map<String, String> createCustomObject(String orgId, int sequence) {
-		Map<String, String> customObject = new HashMap<String, String>();
-
-		customObject.put("Name", "Name_" + sequence);
-		customObject.put("interpreter__c", "interpreter__c_" + sequence);
-		customObject.put("year__c", String.valueOf(1950 + sequence));
-
-		return customObject;
+	
+	private CustomObjectBuilder aCustomObject() {
+	    return new CustomObjectBuilder(); 
+	}
+	
+	private static class CustomObjectBuilder {
+	    
+	    private Map<String, String> customObject = new HashMap<String, String>();
+	    
+	    public CustomObjectBuilder withProperty(String key, String value) {
+	        customObject.put(key, value);
+	        return this;
+	    }
+	    
+	    public Map<String, String> build() {
+            return customObject;
+        }
+	    
 	}
 
 }
