@@ -2,6 +2,7 @@
 
 + [Use Case](#usecase)
 + [Run it!](#runit)
+    * [Create the Custom Object schemas in both organizations](#createcustomobjects)
     * [Running on CloudHub](#runoncloudhub)
     * [Running on premise](#runonopremise)
         * [Properties to be configured](#propertiestobeconfigured)
@@ -28,16 +29,16 @@ Simple steps to get SFDC to SFDC Custom Objects Sync running.
 In order to run the Kick as is, you'll need to create the custom objects provided in your Salesforce accounts. In order to do so, [please follow the steps documented in SalesForce documentation](http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_qs_customobject.htm).
 
 The custom objects and custom fields created for this application are the following:
-1. SalesForce org A:
+1. SalesForce org A
 MusicAlbum
-:	interpreter
-:	year
-2. SalesForce org B:
+	interpreter
+	year
+2. SalesForce org B
 MusicAlbum
-:	interpreter
-:	genre
+	interpreter
+	genre
 
-**Note:** Please, take into account that this sample application uses SalesForce Object Query Language which, when querying for custom objects and fields, requires you to append {{'__c'}} to your query. So for example, to query the music albums' interptreters, the query would be this way: {{SELECT interpreter__c FROM MusicAlbum__c}}.
+**Note:** Please, take into account that this sample application uses SalesForce Object Query Language which, when querying for custom objects and fields, requires you to append `__c` to your query. So for example, to query the music albums' interptreters, the query would be this way: `SELECT interpreter__c FROM MusicAlbum__c`.
 
 ## Running on CloudHub <a name="runoncloudhub"/>
 
