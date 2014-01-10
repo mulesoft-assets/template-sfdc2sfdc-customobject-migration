@@ -52,6 +52,9 @@ local.properties
 target/
 **/*.mflow
 
+# Avoid pushing credentials to repo
+src/test/resources/mule.test.properties
+
 # ------------------------------------------------------------------------ #
 # Added ignore because of https://www.mulesoft.org/jira/browse/STUDIO-4317 #
 # ------------------------------------------------------------------------ #
