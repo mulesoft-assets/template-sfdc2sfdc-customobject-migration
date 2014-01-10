@@ -87,14 +87,6 @@ public class SFDCCustomObjectFilterTest {
 		
 		Map<String,String> customObjectFromSFDCA = new HashMap<String,String>();
 		customObjectFromSFDCA.put("Id", "I0000323AE754F");
-		customObjectFromSFDCA.put("Department", "Engineering");
-		customObjectFromSFDCA.put("Email", "carlos@mendez.com.ar");
-		customObjectFromSFDCA.put("FirstName", "Carlos Saul");
-		customObjectFromSFDCA.put("MailingCity", "Buenos Aires");
-		customObjectFromSFDCA.put("MailingCountry", "Argentina");
-		customObjectFromSFDCA.put("MobilePhone", "1555896532");
-		customObjectFromSFDCA.put("Phone", "1555845632");
-		customObjectFromSFDCA.put("Title", "Ex President");
 		customObjectFromSFDCA.put("LastModifiedDate", "2013-12-10T22:15:33.001Z");
 		
 		return customObjectFromSFDCA;

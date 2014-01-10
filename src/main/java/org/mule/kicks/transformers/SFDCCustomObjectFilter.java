@@ -2,7 +2,6 @@ package org.mule.kicks.transformers;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -24,45 +23,49 @@ import org.mule.transport.NullPayload;
 public class SFDCCustomObjectFilter extends AbstractMessageTransformer {
 	private static final String ID_FIELD = "Id";
 	private static final String FIELD_TYPE = "type";
-	private static final String CONTACT_IN_COMPANY_B = "contactInB";
+	private static final String CUSTOM_OBJECT_IN_COMPANY_B = "customObjectInB";
 	private static final String LAST_MODIFIED_DATE = "LastModifiedDate";
-	private static final String FILTERED_CONTACTS_COUNT = "filteredContactsCount";
+	private static final String FILTERED_CUSTOM_OBJECTS_COUNT = "filteredCustomObjectsCount";
 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 
-		Map<String, String> contactInA = (Map<String, String>) message.getPayload();
+		Map<String, String> customObjectInA = (Map<String, String>) message.getPayload();
 
-		if (message.getInvocationProperty(CONTACT_IN_COMPANY_B) instanceof NullPayload) {
-			contactInA.remove(FIELD_TYPE);
-			contactInA.remove(LAST_MODIFIED_DATE);
+		if (message.getInvocationProperty(CUSTOM_OBJECT_IN_COMPANY_B) instanceof NullPayload) {
+			customObjectInA.remove(FIELD_TYPE);
+			customObjectInA.remove(LAST_MODIFIED_DATE);
+			
+			customObjectInA.remove("year__c");
 		} else {
-			Map<String, String> contactInB = message.getInvocationProperty(CONTACT_IN_COMPANY_B);
+			Map<String, String> customObjectInB = message.getInvocationProperty(CUSTOM_OBJECT_IN_COMPANY_B);
 
 			DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			DateTime lastModifiedDateOfA = formatter.parseDateTime(contactInA.get(LAST_MODIFIED_DATE));
-			DateTime lastModifiedDateOfB = formatter.parseDateTime(contactInB.get(LAST_MODIFIED_DATE));
+			DateTime lastModifiedDateOfA = formatter.parseDateTime(customObjectInA.get(LAST_MODIFIED_DATE));
+			DateTime lastModifiedDateOfB = formatter.parseDateTime(customObjectInB.get(LAST_MODIFIED_DATE));
 
 			if (lastModifiedDateOfA.isAfter(lastModifiedDateOfB)) {
-				contactInA.remove(FIELD_TYPE);
-				contactInA.remove(LAST_MODIFIED_DATE);
-				contactInA.put(ID_FIELD, contactInB.get(ID_FIELD));
+				customObjectInA.remove(FIELD_TYPE);
+				customObjectInA.remove(LAST_MODIFIED_DATE);
+				customObjectInA.put(ID_FIELD, customObjectInB.get(ID_FIELD));
+
+				customObjectInA.remove("year__c");
 			} else {
-				contactInA = null;
+				customObjectInA = null;
 				increaseFilteredContactsCount(message);
 			}
 		}
-		message.setPayload(contactInA);
+		message.setPayload(customObjectInA);
 		return message;
 	}
 
 	private void increaseFilteredContactsCount(MuleMessage message) {
-		Integer filteredCount = (Integer) message.getInvocationProperty(FILTERED_CONTACTS_COUNT);
+		Integer filteredCount = (Integer) message.getInvocationProperty(FILTERED_CUSTOM_OBJECTS_COUNT);
 		if (filteredCount == null) {
 			filteredCount = 0;
 		}
 		filteredCount++;
-		message.setInvocationProperty(FILTERED_CONTACTS_COUNT, filteredCount);
+		message.setInvocationProperty(FILTERED_CUSTOM_OBJECTS_COUNT, filteredCount);
 	}
 
 }

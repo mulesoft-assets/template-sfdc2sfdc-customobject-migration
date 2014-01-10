@@ -40,16 +40,17 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 
 		// This custom object should not be sync
 		Map<String, String> customObject = createCustomObject("A", 0);
-		customObject.put("Email", "");
+		customObject.put("Name", "");
 		createdCustomObjects.add(customObject);
 
 		// This custom object should not be sync
 		customObject = createCustomObject("A", 1);
-		customObject.put("MailingCountry", "ARG");
+		customObject.put("interpreter__c", "Emir Kusturica");
 		createdCustomObjects.add(customObject);
 
 		// This custom object should BE sync
 		customObject = createCustomObject("A", 2);
+		customObject.put("year__c", "2014");
 		createdCustomObjects.add(customObject);
 
 		MuleEvent event = flow.process(getTestEvent(createdCustomObjects, MessageExchangePattern.REQUEST_RESPONSE));
@@ -74,6 +75,7 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		// Delete the created custom objects in B
 		flow = getSubFlow("deleteCustomObjectFromBFlow");
 		flow.initialise();
+		
 		idList.clear();
 		for (Map<String, String> c : createdCustomObjects) {
 			Map<String, String> customObject = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, c);
@@ -96,8 +98,15 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(1)));
 
 		Map<String, String> payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(2));
-		Assert.assertEquals("The custom object should have been sync", createdCustomObjects.get(2).get("Email"),
-				payload.get("Email"));
+
+		System.out.println("created(2) = " + createdCustomObjects.get(2));
+		System.out.println("created(2).name = " + createdCustomObjects.get(2).get("Name"));
+		System.out.println("payload = " + payload);
+		System.out.println("payload.name = " + payload.get("Name"));
+		
+		Assert.assertEquals("The custom object should have been sync", 
+		        createdCustomObjects.get(2).get("Name"),
+				payload.get("Name"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -105,9 +114,7 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 			Map<String, String> customObject) throws Exception {
 		Map<String, String> customObjectMap = new HashMap<String, String>();
 
-		customObjectMap.put("Email", customObject.get("Email"));
-		customObjectMap.put("FirstName", customObject.get("FirstName"));
-		customObjectMap.put("LastName", customObject.get("LastName"));
+		customObjectMap.put("Name", customObject.get("Name"));
 
 		MuleEvent event = flow.process(getTestEvent(customObjectMap, MessageExchangePattern.REQUEST_RESPONSE));
 		Object payload = event.getMessage().getPayload();
@@ -121,16 +128,9 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 	private Map<String, String> createCustomObject(String orgId, int sequence) {
 		Map<String, String> customObject = new HashMap<String, String>();
 
-		customObject.put("FirstName", "FirstName_" + sequence);
-		customObject.put("LastName", "LastName_" + sequence);
-		customObject.put("Email", "some.email." + sequence + "@fakemail.com");
-		customObject.put("Description", "Some fake description");
-		customObject.put("MailingCity", "Denver");
-		customObject.put("MailingCountry", "USA");
-		customObject.put("MobilePhone", "123456789");
-		customObject.put("Department", "department_" + sequence + "_" + orgId);
-		customObject.put("Phone", "123456789");
-		customObject.put("Title", "Dr");
+		customObject.put("Name", "Name_" + sequence);
+		customObject.put("interpreter__c", "interpreter__c_" + sequence);
+		customObject.put("year__c", String.valueOf(1950 + sequence));
 
 		return customObject;
 	}

@@ -7,15 +7,14 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <flow name="mainFlow" doc:name="mainFlow" doc:description="Here you should place the main business logic.">
         <flow-ref name="gatherDataFlow" doc:name="gatherDataFlow"/> 
-        <flow-ref name="filterAndInsertDataFlow" doc:name="filterAndInsertDataFlow"/> 
+        <flow-ref name="filterAndInsertDataFlow" doc:name="filterAndInsertDataFlow"/>
         <logger message="Amount of custom objects #[flowVars['customObjectCount']] - Custom Objects Filtered #[flowVars['filteredCustomObjectsCount']]" level="INFO" doc:name="Logger"/>
         <set-payload value="Amount of custom objects migrated #[flowVars['customObjectCount']] - Amount of custom objects Filtered #[flowVars['filteredCustomObjectsCount']]" doc:name="Set Payload"/>
         <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>
     <sub-flow name="gatherDataFlow" doc:name="gatherDataFlow">
         <logger message="Gathering custom object's data" level="INFO" doc:name="Logger"/>
-<!--             TODO - here, operation, here -->
-		<sfdc:query config-ref="SalesforceA" query="dsql:SELECT Department,Description,Email,FirstName,LastModifiedDate,LastName,MailingCity,MailingCountry,MobilePhone,Phone,Title FROM Contact WHERE (MailingCountry = 'USA' AND Email &lt;&gt; '') ORDER BY Email ASC" doc:name="Salesforce" fetchSize="${page.size}"/>
+		<sfdc:query config-ref="SalesforceA" query="dsql:SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c &gt; 1968 ORDER BY Name ASC" doc:name="Salesforce" fetchSize="${page.size}"/>
         <set-variable variableName="customObjectCount" value="#[payload.size()]" doc:name="customObjectCount"/>
 	</sub-flow>
     <sub-flow name="filterAndInsertDataFlow" doc:name="filterAndInsertDataFlow">
@@ -24,8 +23,8 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         <foreach doc:name="For Each" batchSize="${page.size}">
             <flow-ref name="filterFlow" doc:name="filterFlow"/>
             <expression-filter expression="#[!payload.isEmpty()]" doc:name="Filter if Payload is empty"/>
-<!--             TODO - here, operation, here -->
-            <sfdc:upsert-bulk config-ref="SalesforceB"  type="Contact" doc:name="Upsert custom objects in org B" externalIdFieldName="Id">
+            <logger level="INFO" message="Custom objects to be synced #[payload:]" />
+            <sfdc:upsert-bulk config-ref="SalesforceB" type="MusicAlbum__c" doc:name="Upsert custom objects in org B" externalIdFieldName="Id">
                 <sfdc:objects ref="#[payload]"/>
             </sfdc:upsert-bulk>
         </foreach>
@@ -34,11 +33,10 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         <set-variable variableName="filteredCustomObjectList" value="#[new java.util.ArrayList()]" doc:name="filteredCustomObjectList"/>
         <foreach doc:name="For Each">
             <enricher source="#[payload]" target="#[flowVars['customObjectInB']]" doc:name="Store in variable customObjectInB">
-<!--             TODO - here, operation, here -->
-                <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, LastModifiedDate FROM Contact WHERE Email = '#[payload['Email']]'" doc:name="Check custom object in org B"/>
+                <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name, LastModifiedDate, interpreter__c, genre__c FROM MusicAlbum__c WHERE Name = '#[payload['Name']]'" doc:name="Check custom object in org B"/>
             </enricher>
             <custom-transformer class="org.mule.kicks.transformers.SFDCCustomObjectFilter" doc:name="SFDCCustomObjectFilter"/>
-            <expression-filter expression="#[!(payload is  NullPayload)]" doc:name="Filter if Payload is NullPayload"/>
+            <expression-filter expression="#[!(payload is NullPayload)]" doc:name="Filter if Payload is NullPayload"/>
             <expression-component doc:name="Add Custom Object to filteredCustomObjectList"><![CDATA[#[flowVars['filteredCustomObjectList'].add(payload)]]]></expression-component>
         </foreach>
         <set-payload value="#[flowVars['filteredCustomObjectList']]" doc:name="Set filteredCustomObjectList as Payload"/>
