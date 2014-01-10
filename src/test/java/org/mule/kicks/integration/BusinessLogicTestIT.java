@@ -43,10 +43,10 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		List<Map<String, String>> createdCustomObjectsInB = new ArrayList<Map<String,String>>();
         // This custom object should BE synced (updated) as the year is greater than 1968 and the record exists in the target system
 		createdCustomObjectsInB.add(aCustomObject()
-                    		        .withProperty("Name", "Physical Graffiti")
-                    		        .withProperty("interpreter__c", "Lead Zep")
-                    		        .withProperty("genre__c", "Hard Rock")
-                    		        .build());
+                        		        .withProperty("Name", "Physical Graffiti")
+                        		        .withProperty("interpreter__c", "Lead Zep")
+                        		        .withProperty("genre__c", "Hard Rock")
+                        		        .build());
 		
 		flowB.process(getTestEvent(createdCustomObjectsInB, MessageExchangePattern.REQUEST_RESPONSE));
 
@@ -56,31 +56,31 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 
 		// This custom object should not be synced as the year is not greater than 1968
 		createdCustomObjectsInA.add(aCustomObject()
-                                    .withProperty("Name", "Are You Experienced")
-                                    .withProperty("interpreter__c", "Jimi Hendrix")
-                                    .withProperty("year__c", "1967")
-                                    .build());
+                                        .withProperty("Name", "Are You Experienced")
+                                        .withProperty("interpreter__c", "Jimi Hendrix")
+                                        .withProperty("year__c", "1967")
+                                        .build());
 
 		// This custom object should not be synced as the year is not greater than 1968
 		createdCustomObjectsInA.add(aCustomObject()
-                                     .withProperty("Name", "Revolver")
-                                     .withProperty("interpreter__c", "The Beatles")
-                                     .withProperty("year__c", "1966")
-                                     .build());
+                                         .withProperty("Name", "Revolver")
+                                         .withProperty("interpreter__c", "The Beatles")
+                                         .withProperty("year__c", "1966")
+                                         .build());
 
 		// This custom object should BE synced (inserted) as the year is greater than 1968 and the record doesn't exist in the target system
 		createdCustomObjectsInA.add(aCustomObject()
-                                     .withProperty("Name", "Amputechture")
-                                     .withProperty("interpreter__c", "The Mars Volta")
-                                     .withProperty("year__c", "2006")
-                                     .build());
+                                         .withProperty("Name", "Amputechture")
+                                         .withProperty("interpreter__c", "The Mars Volta")
+                                         .withProperty("year__c", "2006")
+                                         .build());
 		
 		// This custom object should BE synced (updated) as the year is greater than 1968 and the record exists in the target system
 		createdCustomObjectsInA.add(aCustomObject()
-                    		        .withProperty("Name", "Physical Graffiti")
-                    		        .withProperty("interpreter__c", "Led Zeppelin")
-                    		        .withProperty("year__c", "1975")
-                    		        .build());
+                        		        .withProperty("Name", "Physical Graffiti")
+                        		        .withProperty("interpreter__c", "Led Zeppelin")
+                        		        .withProperty("year__c", "1975")
+                        		        .build());
 
 		MuleEvent event = flow.process(getTestEvent(createdCustomObjectsInA, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> results = (List<SaveResult>) event.getMessage().getPayload();

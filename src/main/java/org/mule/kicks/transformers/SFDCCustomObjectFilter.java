@@ -29,7 +29,8 @@ public class SFDCCustomObjectFilter extends AbstractMessageTransformer {
 
 	private static final String CUSTOM_FIELD_1 = "year__c";
 
-	@Override
+    @Override
+    @SuppressWarnings("unchecked")
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 
 		Map<String, String> customObjectInA = (Map<String, String>) message.getPayload();
