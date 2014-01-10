@@ -27,42 +27,65 @@ import com.sforce.soap.partner.SaveResult;
 public class BusinessLogicTestIT extends AbstractKickTestCase {
 
 	private static SubflowInterceptingChainLifecycleWrapper checkCustomObjectflow;
-	private static List<Map<String, String>> createdCustomObjects = new ArrayList<Map<String, String>>();
+	private static List<Map<String, String>> createdCustomObjectsInA = new ArrayList<Map<String, String>>();
 
 	@Before
 	@SuppressWarnings("unchecked")
 	public void setUp() throws Exception {
+	    // Flow to retrieve custom objects from target system after syncing
 		checkCustomObjectflow = getSubFlow("retrieveCustomObjectFlow");
 		checkCustomObjectflow.initialise();
 
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createCustomObjectFlow");
+		// Create object in target system to be updated 
+		SubflowInterceptingChainLifecycleWrapper flowB = getSubFlow("createCustomObjectFlowB");
+		flowB.initialise();
+		
+		List<Map<String, String>> createdCustomObjectsInB = new ArrayList<Map<String,String>>();
+        // This custom object should BE synced (updated) as the year is greater than 1968 and the record exists in the target system
+		createdCustomObjectsInB.add(aCustomObject()
+                    		        .withProperty("Name", "Physical Graffiti")
+                    		        .withProperty("interpreter__c", "Lead Zep")
+                    		        .withProperty("genre__c", "Hard Rock")
+                    		        .build());
+		
+		flowB.process(getTestEvent(createdCustomObjectsInB, MessageExchangePattern.REQUEST_RESPONSE));
+
+		// Create custom objects in source system to be or not to be synced 
+		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createCustomObjectFlowA");
 		flow.initialise();
 
-		// This custom object should not be sync
-		createdCustomObjects.add(aCustomObject()
-                                    .withProperty("Name", "Name_" + 0)
-                                    .withProperty("interpreter__c", "interpreter__c_" + 0)
-                                    .withProperty("year__c", String.valueOf(1950 + 0))
+		// This custom object should not be synced as the year is not greater than 1968
+		createdCustomObjectsInA.add(aCustomObject()
+                                    .withProperty("Name", "Are You Experienced")
+                                    .withProperty("interpreter__c", "Jimi Hendrix")
+                                    .withProperty("year__c", "1967")
                                     .build());
 
-		// This custom object should not be sync
-		createdCustomObjects.add(aCustomObject()
-                                     .withProperty("Name", "Name_" + 1)
-                                     .withProperty("interpreter__c", "interpreter__c_" + 1)
-                                     .withProperty("year__c", String.valueOf(1950 + 1))
+		// This custom object should not be synced as the year is not greater than 1968
+		createdCustomObjectsInA.add(aCustomObject()
+                                     .withProperty("Name", "Revolver")
+                                     .withProperty("interpreter__c", "The Beatles")
+                                     .withProperty("year__c", "1966")
                                      .build());
 
-		// This custom object should BE sync
-		createdCustomObjects.add(aCustomObject()
-                                     .withProperty("Name", "Name_" + 2)
-                                     .withProperty("interpreter__c", "interpreter__c_" + 2)
-                                     .withProperty("year__c", "2014")
+		// This custom object should BE synced (inserted) as the year is greater than 1968 and the record doesn't exist in the target system
+		createdCustomObjectsInA.add(aCustomObject()
+                                     .withProperty("Name", "Amputechture")
+                                     .withProperty("interpreter__c", "The Mars Volta")
+                                     .withProperty("year__c", "2006")
                                      .build());
+		
+		// This custom object should BE synced (updated) as the year is greater than 1968 and the record exists in the target system
+		createdCustomObjectsInA.add(aCustomObject()
+                    		        .withProperty("Name", "Physical Graffiti")
+                    		        .withProperty("interpreter__c", "Led Zeppelin")
+                    		        .withProperty("year__c", "1975")
+                    		        .build());
 
-		MuleEvent event = flow.process(getTestEvent(createdCustomObjects, MessageExchangePattern.REQUEST_RESPONSE));
+		MuleEvent event = flow.process(getTestEvent(createdCustomObjectsInA, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> results = (List<SaveResult>) event.getMessage().getPayload();
 		for (int i = 0; i < results.size(); i++) {
-			createdCustomObjects.get(i).put("Id", results.get(i).getId());
+			createdCustomObjectsInA.get(i).put("Id", results.get(i).getId());
 		}
 	}
 
@@ -73,7 +96,7 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		flow.initialise();
 
 		List<String> idList = new ArrayList<String>();
-		for (Map<String, String> c : createdCustomObjects) {
+		for (Map<String, String> c : createdCustomObjectsInA) {
 			idList.add(c.get("Id"));
 		}
 		flow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
@@ -83,7 +106,7 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		flow.initialise();
 		
 		idList.clear();
-		for (Map<String, String> c : createdCustomObjects) {
+		for (Map<String, String> c : createdCustomObjectsInA) {
 			Map<String, String> customObject = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, c);
 			if (customObject != null) {
 				idList.add(customObject.get("Id"));
@@ -98,16 +121,23 @@ public class BusinessLogicTestIT extends AbstractKickTestCase {
 		flow.process(getTestEvent("", MessageExchangePattern.REQUEST_RESPONSE));
 
 		Assert.assertEquals("The custom object should not have been sync", null,
-				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(0)));
+				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjectsInA.get(0)));
 
 		Assert.assertEquals("The custom object should not have been sync", null,
-				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(1)));
+				invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjectsInA.get(1)));
 
-		Map<String, String> payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjects.get(2));
-
+		Map<String, String> payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjectsInA.get(2));
 		Assert.assertEquals("The custom object should have been sync", 
-		        createdCustomObjects.get(2).get("Name"),
+		        createdCustomObjectsInA.get(2).get("Name"),
 				payload.get("Name"));
+
+		payload = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, createdCustomObjectsInA.get(3));
+		Assert.assertEquals("The custom object should have been sync (Name)", 
+		        createdCustomObjectsInA.get(3).get("Name"),
+		        payload.get("Name"));
+		Assert.assertEquals("The custom object should have been sync (interpreter__c)", 
+		        createdCustomObjectsInA.get(3).get("interpreter__c"),
+		        payload.get("interpreter__c"));
 	}
 
 	@SuppressWarnings("unchecked")
