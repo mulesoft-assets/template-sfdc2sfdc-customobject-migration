@@ -15,13 +15,29 @@
 # Use Case <a name="usecase"/>
 As a Salesforce admin I want to syncronize custom objects between two Salesfoce orgs.
 
-This Kick (template) should serve as a foundation for the process of migrating contacts from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a contact already exists in the destination org. 
+This Kick (template) should serve as a foundation for the process of migrating contacts from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a custom object already exists in the destination org. 
 
-As implemented, for each one of the contacts from one instance of Salesforce, determines if it meets the requirements to be synced and if so, checks if the contact already exists syncing only if the record from the target instance is older. 
+As implemented, for each one of the custom objects from one instance of Salesforce, determines if it meets the requirements to be synced and if so, checks if the custom object already exists syncing only if the record from the target instance is older. 
 
 # Run it! <a name="runit"/>
 
 Simple steps to get SFDC to SFDC Custom Objects Sync running.
+
+## Create the Custom Object schemas in both organizations <a name="createcustomobjects" />
+
+In order to run the Kick as is, you'll need to create the custom objects provided in your Salesforce accounts. In order to do so, [please follow the steps documented in SalesForce documentation](http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_qs_customobject.htm).
+
+The custom objects and custom fields created for this application are the following:
+1. SalesForce org A:
+MusicAlbum
+:	interpreter
+:	year
+2. SalesForce org B:
+MusicAlbum
+:	interpreter
+:	genre
+
+**Note:** Please, take into account that this sample application uses SalesForce Object Query Language which, when querying for custom objects and fields, requires you to append {{'__c'}} to your query. So for example, to query the music albums' interptreters, the query would be this way: {{SELECT interpreter__c FROM MusicAlbum__c}}.
 
 ## Running on CloudHub <a name="runoncloudhub"/>
 
