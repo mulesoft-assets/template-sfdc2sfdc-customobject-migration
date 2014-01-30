@@ -1,4 +1,4 @@
-# Mule Kick: SFDC to SFDC Custom Objects Sync
+# Mule Kick: SFDC to SFDC Custom Objects Migration
 
 + [Use Case](#usecase)
 + [Run it!](#runit)
@@ -8,21 +8,26 @@
         * [Properties to be configured](#propertiestobeconfigured)
 + [Customize It!](#customizeit)
     * [config.xml](#configxml)
-    * [endpoints.xml](#endpointsxml)
+    * [inboundEndpoints.xml](#endpointsxml)
     * [businessLogic.xml](#businesslogicxml)
     * [errorHandling.xml](#errorhandlingxml)
 
 
 # Use Case <a name="usecase"/>
-As a Salesforce admin I want to syncronize custom objects between two Salesfoce orgs.
+As a Salesforce admin I want to migrate custom objects between two Salesfoce orgs.
 
 This Kick (template) should serve as a foundation for the process of migrating contacts from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a custom object already exists in the destination org. 
 
-As implemented, for each one of the custom objects from one instance of Salesforce, determines if it meets the requirements to be synced and if so, checks if the custom object already exists syncing only if the record from the target instance is older. 
+As implemented, this Kick leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+The batch job is divided in Input, Process and On Complete stages.
+During the Input stage the Kick will go to the SalesForce Org A and query all the existing custom objects that match the filter criteria.
+During the Process stage, each SFDC Custom Object will be filtered depending on, if it has an existing matching custom object in the SFDC Org B and if the last updated date of the later is greater than the one of SFDC Org A.
+The last step of the Process stage will group the custom objects and create them in SFDC Org B.
+Finally during the On Complete stage the Kick will both otput statistics data into the console and send a notification email with the results of the batch excecution. 
 
 # Run it! <a name="runit"/>
 
-Simple steps to get SFDC to SFDC Custom Objects Sync running.
+Simple steps to get SFDC to SFDC Custom Objects Migration running.
 
 ## Create the Custom Object schemas in both organizations <a name="createcustomobjects" />
 
@@ -56,7 +61,8 @@ After this, to trigger the use case you just need to hit the local http endpoint
 In order to use this Mule Kick you need to configure properties (Credentials, configurations, etc.) either in properties file or in CloudHub as Environment Variables. Detail list with examples:
 
 ### Application configuration
-+ http.port `9090` 
++ http.port `9090`
++ startingDate `2014-01-30'T'00:00:00.000'Z'`
 
 #### SalesForce Connector configuration for company A
 + sfdc.a.username `bob.dylan@orga`
@@ -70,8 +76,10 @@ In order to use this Mule Kick you need to configure properties (Credentials, co
 + sfdc.b.securityToken `ces56arl7apQs56XTddf34X`
 + sfdc.b.url `https://login.salesforce.com/services/Soap/u/26.0`
 
-
-
+#### eMail Details
++ mail.from `batch.contact.migration%40mulesoft.com`
++ mail.to `your.username@youremaildomain.com`
++ mail.subject `Batch Job Finished Report`
 
 # Customize It!<a name="customizeit"/>
 
@@ -82,7 +90,7 @@ Of course more files will be found such as Test Classes and [Mule Application Fi
 Here is a list of the main XML files you'll find in this application:
 
 * [config.xml](#configxml)
-* [endpoints.xml](#endpointsxml)
+* [inboundEndpoints.xml](#endpointsxml)
 * [businessLogic.xml](#businesslogicxml)
 * [errorHandling.xml](#errorhandlingxml)
 
@@ -92,7 +100,7 @@ Configuration for Connectors and [Properties Place Holders](http://www.mulesoft.
 
 In the visual editor they can be found on the *Global Element* tab.
 
-## endpoints.xml<a name="endpointsxml"/>
+## inboundEndpoints.xml<a name="endpointsxml"/>
 This is the file where you will found the inbound and outbound sides of your integration app.
 This Kick has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
 
@@ -105,22 +113,9 @@ This Kick has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentat
 
 
 ## businessLogic.xml<a name="businesslogicxml"/>
-Functional aspect of the kick is implemented on this XML, directed by one flow responsible of conducting the generation of the report.
-The *mainFlow* organises the job in two different steps and finally sets the payload that will be the response for the HTTP Call.
+Functional aspect of the kick is implemented on this XML, directed by one flow responsible of excecuting the logic.
+For the purpouse of this particular Kick the *mainFlow* just excecutes the Batch Job which handles all the logic of it.
 This flow has Exception Strategy that basically consists on invoking the *defaultChoiseExceptionStrategy* defined in *errorHandling.xml* file.
-
-
-###  Gather Data Flow
-Mainly consisting of one call (Query) to bring all Contacts from SFDC Org A and setting the variable that would count the total of synced.
-
-###  Filter And Insert Data Flow
-The main component of this flow is a *For Each* processor that will try to either update or create a contact in the target SFDC org in bulks defined by the property `page.size`. Running this process in batch mode is key for performance, mainly to reduce the number of calls to SFDC API making use of their Batch API Methods.
-
-Before calling the *Bulk-Upsert* (Upsert since the action will be either an Update or a Insert) to SFDC Target company, Contacts will be filtered and the responsible for that will be the Sub Flow name *filterFlow*:
-+ A bulk (List) of Contacts will be received and for each one a *SFDCCustomObjectFilter* [Java Transformer](http://www.mulesoft.org/documentation/display/current/Java+Transformer+Reference) will determine (With a help of a [Filter Expression](http://www.mulesoft.org/documentation/display/current/Using+Filters) as the next processor) if the Contact has to be synced on not. If meets the requirements, it will be added to the list *filteredContactList* that will turn to be the payload at the end of the execution of this flow. 
-+ In this Kick a Custom Object to be synced will be filtered only if it exists already in target SFDC org and the data from Org A is older. In order to change this behaviour you just need to change logic on the *SFDCCustomObjectFilter* Java Transformer.
-
-The *filterFlow* as explained will return a list that will be filtered if it is empty, and if not, Bulk Sync method will take place. To check the results/status of this batch process you should go into SFDC UI to **Setup >  Monitoring > Bulk Data Load Jobs**.
 
 
 ## errorHandling.xml<a name="errorhandlingxml"/>
