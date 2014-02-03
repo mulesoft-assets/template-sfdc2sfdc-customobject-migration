@@ -30,16 +30,16 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 						query="SELECT Id, Name, LastModifiedDate, interpreter__c, genre__c FROM MusicAlbum__c WHERE Name = '#[payload['Name']]'"
 						doc:name="query customObject in Salesforce instance B" />
 				</enricher>
-				<expression-component doc:name="remove Id from CustomObject"><![CDATA[payload.remove('Id');]]></expression-component>
+				<expression-component doc:name="remove Id from CustomObject"><![CDATA[// Remove ID from object as it is not valid to create an object with a predefined ID
+payload.remove('Id');]]></expression-component>
 			</batch:step>
 			<batch:step name="selectNewerCustomObjectStep"
 				filter-expression="#[recordVars['customObjectInB'] is NullPayload]">
 				<choice doc:name="Choice">
 					<when
 						expression="#[org.mule.kicks.util.CustomObjectDateComparator.isAfter(payload, recordVars['customObjectInB'])]">
-						<expression-component doc:name="define Id in SalesForce Intance B"><![CDATA[payload.put('Id', recordVars['customObjectInB']['Id']);
-
-]]></expression-component>
+						<expression-component doc:name="define Id in SalesForce Intance B"><![CDATA[// Set ID to the one in target instance for update
+payload.put('Id', recordVars['customObjectInB']['Id']);]]></expression-component>
 					</when>
 					<otherwise>
 						<set-payload doc:name="set to null to skip this customObject"
@@ -49,10 +49,11 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			</batch:step>
 			<batch:step name="createCustomObjectsInBStep"
 				filter-expression="#[payload is NullPayload]">
-				<expression-component doc:name="remove Fields type and LastModifiedDate"><![CDATA[payload.remove('year__c');
+				<expression-component doc:name="remove fields type and LastModifiedDate and map custom fields"><![CDATA[payload.remove('type');
+payload.remove('LastModifiedDate');
 
-payload.remove('type');
-payload.remove('LastModifiedDate');]]></expression-component>
+// TODO - Here you should remove all custom fields that don't exist in the target system and map the ones that vary in type/format
+payload.remove('year__c');]]></expression-component>
 				<logger message="CustomObject to create = #[payload]" level="ERROR"
 					doc:name="log CustomObject to create" />
 				<batch:commit size="200" doc:name="Batch Commit">
