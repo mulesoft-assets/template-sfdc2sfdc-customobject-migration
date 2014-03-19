@@ -1,4 +1,4 @@
-# Mule Kick: SFDC to SFDC Custom Objects Migration
+# Anypoint Template: SFDC to SFDC Custom Objects Migration
 
 + [Use Case](#usecase)
 + [Run it!](#runit)
@@ -8,7 +8,7 @@
         * [Properties to be configured](#propertiestobeconfigured)
 + [Customize It!](#customizeit)
     * [config.xml](#configxml)
-    * [inboundEndpoints.xml](#endpointsxml)
+    * [endpoints.xml](#endpointsxml)
     * [businessLogic.xml](#businesslogicxml)
     * [errorHandling.xml](#errorhandlingxml)
 
@@ -16,14 +16,14 @@
 # Use Case <a name="usecase"/>
 As a Salesforce admin I want to migrate custom objects between two Salesfoce orgs.
 
-This Kick (template) should serve as a foundation for the process of migrating contacts from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a custom object already exists in the destination org. 
+This Template should serve as a foundation for the process of migrating contacts from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a custom object already exists in the destination org. 
 
-As implemented, this Kick leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+As implemented, this Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
-During the Input stage the Kick will go to the SalesForce Org A and query all the existing custom objects that match the filter criteria.
+During the Input stage the Template will go to the SalesForce Org A and query all the existing custom objects that match the filter criteria.
 During the Process stage, each SFDC Custom Object will be filtered depending on, if it has an existing matching custom object in the SFDC Org B and if the last updated date of the later is greater than the one of SFDC Org A.
 The last step of the Process stage will group the custom objects and create them in SFDC Org B.
-Finally during the On Complete stage the Kick will both otput statistics data into the console and send a notification email with the results of the batch excecution. 
+Finally during the On Complete stage the Temaplate will both otput statistics data into the console and send a notification email with the results of the batch excecution. 
 
 # Run it! <a name="runit"/>
 
@@ -31,7 +31,7 @@ Simple steps to get SFDC to SFDC Custom Objects Migration running.
 
 ## Create the Custom Object schemas in both organizations <a name="createcustomobjects" />
 
-In order to run the Kick as is, you'll need to create the custom objects provided in your Salesforce accounts. In order to do so, [please follow the steps documented in SalesForce documentation](http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_qs_customobject.htm).
+In order to run the Template as is, you'll need to create the custom objects provided in your Salesforce accounts. In order to do so, [please follow the steps documented in SalesForce documentation](http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_qs_customobject.htm).
 
 The custom objects and custom fields created for this application are the following:
 1. SalesForce org A
@@ -49,16 +49,16 @@ MusicAlbum
 
 While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
 
-Once your app is all set and started, supposing you choose as domain name `sfdccustomobjectsync` to trigger the use case you just need to hit `http://sfdccustomobjectsync.cloudhub.io/synccustomobjects` and report will be sent to the emails configured.
+Once your app is all set and started, supposing you choose as domain name `sfdccustomobjectmigration` to trigger the use case you just need to hit `http://sfdccustomobjectmigration.cloudhub.io/migratecustomobjects` and report will be sent to the emails configured.
 
 ## Running on premise <a name="runonopremise"/>
 Complete all properties in one of the property files, for example in [mule.prod.properties] (../blob/master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`.
 
-After this, to trigger the use case you just need to hit the local http endpoint with the port you configured in your file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/synccustomobjects` and this will create a CSV report and send it to the mails set.
+After this, to trigger the use case you just need to hit the local http endpoint with the port you configured in your file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migratecustomobjects` and this will create a CSV report and send it to the mails set.
 
 ## Properties to be configured (With examples)<a name="propertiestobeconfigured"/>
 
-In order to use this Mule Kick you need to configure properties (Credentials, configurations, etc.) either in properties file or in CloudHub as Environment Variables. Detail list with examples:
+In order to use this Mule Template you need to configure properties (Credentials, configurations, etc.) either in properties file or in CloudHub as Environment Variables. Detail list with examples:
 
 ### Application configuration
 + http.port `9090`
@@ -83,14 +83,14 @@ In order to use this Mule Kick you need to configure properties (Credentials, co
 
 # Customize It!<a name="customizeit"/>
 
-This brief guide intends to give a high level idea of how this Kick is built and how you can change it according to your needs.
-As mule applications are based on XML files, this page will be organised by describing all the XML that conform the Kick.
+This brief guide intends to give a high level idea of how this Template is built and how you can change it according to your needs.
+As mule applications are based on XML files, this page will be organised by describing all the XML that conform the Template.
 Of course more files will be found such as Test Classes and [Mule Application Files](http://www.mulesoft.org/documentation/display/current/Application+Format), but to keep it simple we will focus on the XMLs.
 
 Here is a list of the main XML files you'll find in this application:
 
 * [config.xml](#configxml)
-* [inboundEndpoints.xml](#endpointsxml)
+* [endpoints.xml](#endpointsxml)
 * [businessLogic.xml](#businesslogicxml)
 * [errorHandling.xml](#errorhandlingxml)
 
@@ -100,21 +100,21 @@ Configuration for Connectors and [Properties Place Holders](http://www.mulesoft.
 
 In the visual editor they can be found on the *Global Element* tab.
 
-## inboundEndpoints.xml<a name="endpointsxml"/>
+## endpoints.xml<a name="endpointsxml"/>
 This is the file where you will found the inbound and outbound sides of your integration app.
-This Kick has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
+This Template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
 
 ###  Inbound Flow
 **HTTP Inbound Endpoint** - Start Report Generation
 + `${http.port}` is set as a property to be defined either on a property file or in CloudHub environment variables.
-+ The path configured by default is `synccontacts` and you are free to change for the one you prefer.
++ The path configured by default is `migratecustomobjects` and you are free to change for the one you prefer.
 + The host name for all endpoints in your CloudHub configuration should be defined as `localhost`. CloudHub will then route requests from your application domain URL to the endpoint.
-+ The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Contacts synced and filtered by the criteria specified.
++ The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Contacts migrated and filtered by the criteria specified.
 
 
 ## businessLogic.xml<a name="businesslogicxml"/>
-Functional aspect of the kick is implemented on this XML, directed by one flow responsible of excecuting the logic.
-For the purpouse of this particular Kick the *mainFlow* just excecutes the Batch Job which handles all the logic of it.
+Functional aspect of the Template is implemented on this XML, directed by one flow responsible of excecuting the logic.
+For the purpouse of this particular Template the *mainFlow* just excecutes the Batch Job which handles all the logic of it.
 This flow has Exception Strategy that basically consists on invoking the *defaultChoiseExceptionStrategy* defined in *errorHandling.xml* file.
 
 

@@ -1,4 +1,4 @@
-package org.mule.kicks.util;
+package org.mule.templates.util;
 
 import java.util.Map;
 

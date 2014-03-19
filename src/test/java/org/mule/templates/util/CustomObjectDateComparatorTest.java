@@ -1,13 +1,14 @@
-package org.mule.kicks.util;
+package org.mule.templates.util;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.mule.kicks.builders.SfdcObjectBuilder.aCustomObject;
+import static org.mule.templates.builders.SfdcObjectBuilder.aCustomObject;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.mule.api.transformer.TransformerException;
+import org.mule.templates.util.CustomObjectDateComparator;
 
 public class CustomObjectDateComparatorTest {
 	

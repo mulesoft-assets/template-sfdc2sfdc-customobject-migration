@@ -1,8 +1,8 @@
-package org.mule.kicks.integration;
+package org.mule.templates.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mule.kicks.builders.SfdcObjectBuilder.aCustomObject;
+import static org.mule.templates.builders.SfdcObjectBuilder.aCustomObject;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import com.sforce.soap.partner.SaveResult;
  * 
  * @author damiansima
  */
-public class BusinessLogicTestIT extends AbstractKickTestCase {
+public class BusinessLogicTestIT extends AbstractTemplateTestCase {
 
 	private static final String KICK_NAME = "sfdc2sfdc-customobjectsync";
 
