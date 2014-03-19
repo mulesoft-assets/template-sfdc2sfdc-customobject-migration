@@ -34,13 +34,13 @@ import com.sforce.soap.partner.SaveResult;
 
 /**
  * The objective of this class is to validate the correct behavior of the Mule
- * Kick that make calls to external systems.
+ * Template that make calls to external systems.
  * 
  * @author damiansima
  */
 public class BusinessLogicTestIT extends AbstractTemplateTestCase {
 
-	private static final String KICK_NAME = "sfdc2sfdc-customobjectsync";
+	private static final String TEMPLATE_NAME = "sfdc2sfdc-customobject-migration";
 
 	private static SubflowInterceptingChainLifecycleWrapper checkCustomObjectflow;
 	private static List<Map<String, Object>> createdCustomObjectsInA = new ArrayList<Map<String, Object>>();
@@ -211,7 +211,7 @@ public class BusinessLogicTestIT extends AbstractTemplateTestCase {
 	}
 
 	private String generateUnique(String string) {
-		return MessageFormat.format("{0}-{1}-{2}", KICK_NAME, String.valueOf(System.currentTimeMillis()).replaceAll(",", ""), string);
+		return MessageFormat.format("{0}-{1}-{2}", TEMPLATE_NAME, String.valueOf(System.currentTimeMillis()).replaceAll(",", ""), string);
 	}
 
 	protected void awaitJobTermination() throws Exception {
