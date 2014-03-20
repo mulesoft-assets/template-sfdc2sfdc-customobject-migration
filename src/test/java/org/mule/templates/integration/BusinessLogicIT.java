@@ -92,11 +92,11 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// This custom object should BE synced (updated) as the year is greater
 		// than 1968 and the record exists in the target system
 		createdCustomObjectsInB.add(aCustomObject() //
-		.with("Name", "Physical Graffiti")
+		.with("Name", buildUniqueName(TEMPLATE_NAME, "CustomObjectNameInB0"))
 													//
-													.with("interpreter__c", "Lead Zep")
+													.with("interpreter__c", "IntepreterInB0")
 													//
-													.with("genre__c", "Hard Rock")
+													.with("genre__c", "GenreInB0")
 													//
 													.build());
 
@@ -109,9 +109,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// This custom object should not be synced as the year is not greater
 		// than 1968
 		createdCustomObjectsInA.add(aCustomObject() //
-		.with("Name", buildUniqueName(TEMPLATE_NAME, "Are You Experienced"))
+		.with("Name", buildUniqueName(TEMPLATE_NAME, "CustomObjectNameInA0"))
 													//
-													.with("interpreter__c", "Jimi Hendrix")
+													.with("interpreter__c", "IntepreterInA0")
 													//
 													.with("year__c", "1967")
 													//
@@ -120,9 +120,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// This custom object should not be synced as the year is not greater
 		// than 1968
 		createdCustomObjectsInA.add(aCustomObject() //
-		.with("Name", buildUniqueName(TEMPLATE_NAME, "Revolver"))
+		.with("Name", buildUniqueName(TEMPLATE_NAME, "CustomObjectNameInA1"))
 													//
-													.with("interpreter__c", "The Beatles")
+													.with("interpreter__c", "IntepreterInA1")
 													//
 													.with("year__c", "1966")
 													//
@@ -131,9 +131,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// This custom object should BE synced (inserted) as the year is greater
 		// than 1968 and the record doesn't exist in the target system
 		createdCustomObjectsInA.add(aCustomObject() //
-		.with("Name", buildUniqueName(TEMPLATE_NAME, "Amputechture"))
+		.with("Name", buildUniqueName(TEMPLATE_NAME, "CustomObjectNameInA2"))
 													//
-													.with("interpreter__c", "The Mars Volta")
+													.with("interpreter__c", "IntepreterInA2")
 													//
 													.with("year__c", "2006")
 													//
@@ -142,9 +142,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// This custom object should BE synced (updated) as the year is greater
 		// than 1968 and the record exists in the target system
 		createdCustomObjectsInA.add(aCustomObject() //
-		.with("Name", buildUniqueName(TEMPLATE_NAME, "Physical Graffiti"))
+		.with("Name", buildUniqueName(TEMPLATE_NAME, "CustomObjectNameInA3"))
 													//
-													.with("interpreter__c", "Led Zeppelin")
+													.with("interpreter__c", "IntepreterInA3")
 													//
 													.with("year__c", "1975")
 													//
