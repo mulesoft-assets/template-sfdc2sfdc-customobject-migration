@@ -49,6 +49,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 
 	private static SubflowInterceptingChainLifecycleWrapper checkCustomObjectflow;
 	private static List<Map<String, Object>> createdCustomObjectsInA = new ArrayList<Map<String, Object>>();
+	private static List<Map<String, Object>> createdCustomObjectsInB = new ArrayList<Map<String, Object>>();
 
 	protected static final int TIMEOUT = 60;
 
@@ -88,7 +89,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		SubflowInterceptingChainLifecycleWrapper flowB = getSubFlow("createCustomObjectFlowB");
 		flowB.initialise();
 
-		List<Map<String, Object>> createdCustomObjectsInB = new ArrayList<Map<String, Object>>();
+		createdCustomObjectsInB = new ArrayList<Map<String, Object>>();
 		// This custom object should BE synced (updated) as the year is greater
 		// than 1968 and the record exists in the target system
 		createdCustomObjectsInB.add(aCustomObject() //
@@ -101,6 +102,15 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 													.build());
 
 		flowB.process(getTestEvent(createdCustomObjectsInB, MessageExchangePattern.REQUEST_RESPONSE));
+
+		MuleEvent event = flowB.process(getTestEvent(createdCustomObjectsInA, MessageExchangePattern.REQUEST_RESPONSE));
+		List<SaveResult> results = (List<SaveResult>) event.getMessage()
+															.getPayload();
+		for (int i = 0; i < results.size(); i++) {
+			createdCustomObjectsInA.get(i)
+									.put("Id", results.get(i)
+														.getId());
+		}
 
 		// Create custom objects in source system to be or not to be synced
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createCustomObjectFlowA");
@@ -150,9 +160,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 													//
 													.build());
 
-		MuleEvent event = flow.process(getTestEvent(createdCustomObjectsInA, MessageExchangePattern.REQUEST_RESPONSE));
-		List<SaveResult> results = (List<SaveResult>) event.getMessage()
-															.getPayload();
+		event = flow.process(getTestEvent(createdCustomObjectsInA, MessageExchangePattern.REQUEST_RESPONSE));
+		results = (List<SaveResult>) event.getMessage()
+											.getPayload();
 		for (int i = 0; i < results.size(); i++) {
 			createdCustomObjectsInA.get(i)
 									.put("Id", results.get(i)
@@ -170,7 +180,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// Delete the created custom objects in A
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteCustomObjectFromAFlow");
 		flow.initialise();
-		
 		List<String> idList = new ArrayList<String>();
 		for (Map<String, Object> c : createdCustomObjectsInA) {
 			idList.add(String.valueOf(c.get("Id")));
@@ -180,7 +189,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		// Delete the created custom objects in B
 		flow = getSubFlow("deleteCustomObjectFromBFlow");
 		flow.initialise();
-		
 		idList.clear();
 		for (Map<String, Object> c : createdCustomObjectsInA) {
 			Map<String, Object> customObject = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, c);
@@ -188,6 +196,13 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 				idList.add(String.valueOf(customObject.get("Id")));
 			}
 		}
+		for (Map<String, Object> c : createdCustomObjectsInB) {
+			Map<String, Object> customObject = invokeRetrieveCustomObjectFlow(checkCustomObjectflow, c);
+			if (customObject != null) {
+				idList.add(String.valueOf(customObject.get("Id")));
+			}
+		}
+
 		flow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
 	}
 
