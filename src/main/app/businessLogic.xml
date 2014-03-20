@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<batch:threading-profile poolExhaustedAction="WAIT" />
 		<batch:input>
 			<sfdc:query config-ref="SalesforceA"
-				query="dsql:SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c > 1968 AND LastModifiedDate &gt; ${startingDate}"
+				query="dsql:SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c > 1968"
 				doc:name="query CustomObjects from Salesforce instance A" fetchSize="${page.size}" />
 		</batch:input>
 		<batch:process-records>

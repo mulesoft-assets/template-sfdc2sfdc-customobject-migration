@@ -62,7 +62,6 @@ In order to use this Mule Template you need to configure properties (Credentials
 
 ### Application configuration
 + http.port `9090`
-+ startingDate `2014-01-30'T'00:00:00.000'Z'`
 
 #### SalesForce Connector configuration for company A
 + sfdc.a.username `bob.dylan@orga`
