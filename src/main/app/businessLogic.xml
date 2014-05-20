@@ -65,7 +65,7 @@ payload.remove('year__c');]]></expression-component>
 			</batch:step>
 		</batch:process-records>
 		<batch:on-complete>
-			<all doc:name="All">
+			<scatter-gather doc:name="All">
 				<processor-chain>
 					<json:object-to-json-transformer
 						doc:name="transform BatchJobInstance to JSON" />
@@ -80,7 +80,7 @@ payload.remove('year__c');]]></expression-component>
 						to="${mail.to}" from="${mail.from}" subject="${mail.subject}"
 						responseTimeout="10000" connector-ref="gmailConnector" doc:name="send mail" />
 				</processor-chain>
-			</all>
+			</scatter-gather>
 		</batch:on-complete>
 	</batch:job>
 	<flow name="mainFlow" doc:name="mainFlow" processingStrategy="synchronous"
