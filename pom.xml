@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.templates</groupId>
 	<artifactId>template-sfdc2sfdc-customobject-migration</artifactId>
-	<packaging>mule</packaging>
+	<packaging>${packaging.type}</packaging>
 	<version>1.0.0</version>
 	<name>SFDC2SFDCCustomObjectMigration Mule Template Project</name>
 
