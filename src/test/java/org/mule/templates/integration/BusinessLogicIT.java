@@ -97,7 +97,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 													//
 													.with("interpreter__c", "IntepreterInB0")
 													//
-													.with("genre__c", "GenreInB0")
 													//
 													.build());
 
