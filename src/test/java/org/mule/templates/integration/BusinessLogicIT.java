@@ -7,36 +7,27 @@
 package org.mule.templates.integration;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 import static org.mule.templates.builders.SfdcObjectBuilder.aCustomObject;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.Flow;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
-import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
-import org.mule.tck.probe.Prober;
 import org.mule.transport.NullPayload;
 
 import com.mulesoft.module.batch.BatchTestHelper;
-import com.mulesoft.module.batch.api.BatchJobInstance;
 import com.mulesoft.module.batch.api.notification.BatchNotification;
 import com.mulesoft.module.batch.api.notification.BatchNotificationListener;
-import com.mulesoft.module.batch.engine.BatchJobInstanceAdapter;
 import com.mulesoft.module.batch.engine.BatchJobInstanceStore;
 import com.sforce.soap.partner.SaveResult;
 

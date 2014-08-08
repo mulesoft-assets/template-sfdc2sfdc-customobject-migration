@@ -4,7 +4,7 @@
 	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -33,23 +33,10 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 				<expression-component doc:name="remove Id from CustomObject"><![CDATA[// Remove ID from object as it is not valid to create an object with a predefined ID
 payload.remove('Id');]]></expression-component>
 			</batch:step>
-			<batch:step name="selectNewerCustomObjectStep"
-				accept-expression="!(recordVars['customObjectInB'] is NullPayload)">
-				<choice doc:name="Choice">
-					<when
-						expression="#[org.mule.templates.util.CustomObjectDateComparator.isAfter(payload, recordVars['customObjectInB'])]">
-						<expression-component doc:name="define Id in SalesForce Intance B"><![CDATA[// Set ID to the one in target instance for update
-payload.put('Id', recordVars['customObjectInB']['Id']);]]></expression-component>
-					</when>
-					<otherwise>
-						<set-payload doc:name="set to null to skip this customObject"
-							value="#[return null]" />
-					</otherwise>
-				</choice>
-			</batch:step>
 			<batch:step name="createCustomObjectsInBStep"
 				accept-expression="!(payload is NullPayload)">
-				<expression-component doc:name="remove fields type and LastModifiedDate and map custom fields"><![CDATA[payload.remove('type');
+				<expression-component doc:name="prepare properties for upsert"><![CDATA[payload['Id'] = recordVars['customObjectInB'] is NullPayload ? null : recordVars['customObjectInB']['Id']
+payload.remove('type');
 payload.remove('LastModifiedDate');
 
 // TODO - Here you should remove all custom fields that don't exist in the target system and map the ones that vary in type/format

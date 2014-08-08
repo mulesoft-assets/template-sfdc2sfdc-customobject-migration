@@ -7,14 +7,14 @@
 		<section id="use_case">
 As a Salesforce admin I want to migrate custom objects between two Salesfoce orgs.
 
-This Template should serve as a foundation for the process of migrating custom objects from one Salesfoce instance to another, being able to specify filtering criterias and desired behaviour when a custom object already exists in the destination org. 
+This Template should serve as a foundation for the process of migrating custom objects from one Salesfoce instance to another, being able to specify filtering criteria and desired behaviour when a custom object already exists in the destination org. 
 
 As implemented, this Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
 During the Input stage the Template will go to the SalesForce Org A and query all the existing custom objects that match the filter criteria.
-During the Process stage, each SFDC Custom Object will be filtered depending on, if it has an existing matching custom object in the SFDC Org B and if the last updated date of the later is greater than the one of SFDC Org A.
+During the Process stage, each SFDC Custom Object will be filtered depending on, if it has an existing matching custom object in the SFDC Org B.
 The last step of the Process stage will group the custom objects and create them in SFDC Org B.
-Finally during the On Complete stage the Temaplate will both otput statistics data into the console and send a notification email with the results of the batch excecution. 
+Finally during the On Complete stage the Template will both output statistics data into the console and send a notification email with the results of the batch execution. 
 		</section>
 		<section id="considerations">
 <![CDATA[
