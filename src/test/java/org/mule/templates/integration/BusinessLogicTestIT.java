@@ -36,7 +36,7 @@ import com.sforce.soap.partner.SaveResult;
  * 
  * @author cesar.garcia
  */
-public class BusinessLogicIT extends AbstractTemplateTestCase {
+public class BusinessLogicTestIT extends AbstractTemplateTestCase {
 
 	private static final String TEMPLATE_NAME = "sfdc2sfdc-customobject-migration";
 
