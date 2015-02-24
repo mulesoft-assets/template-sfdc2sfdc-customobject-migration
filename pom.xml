@@ -10,14 +10,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>template-sfdc2sfdc-customobject-migration</artifactId>
 	<packaging>mule</packaging>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.5</version>
 	<name>template-sfdc2sfdc-customobject-migration Mule Template Project</name>
 
 	<scm>
 		<connection>scm:git:https://github.com/mulesoft/template-sfdc2sfdc-customobject-migration.git</connection>
 		<developerConnection>scm:git:https://github.com/mulesoft/template-sfdc2sfdc-customobject-migration.git</developerConnection>
 		<url>https://github.com/mulesoft/template-sfdc2sfdc-customobject-migration</url>
-	  <tag>HEAD</tag>
+	  <tag>v1.0.5</tag>
   </scm>
 
 	<build>
