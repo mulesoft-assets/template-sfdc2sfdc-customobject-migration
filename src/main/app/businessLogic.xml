@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
 	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.6.0"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.7.1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -14,7 +14,8 @@ http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
 	<batch:job name="migrateCustomObjectsBatch">
 		<batch:threading-profile poolExhaustedAction="WAIT" />
 		<batch:input>
@@ -24,26 +25,31 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</batch:input>
 		<batch:process-records>
 			<batch:step name="getCustomObjectInBStep">
-				<enricher source="#[payload]" target="#[recordVars['customObjectInB']]"
-					doc:name="store result in record var 'customObjectInB'">
+				<enricher source="#[payload == null ? null : payload['Id'] ]" target="#[payload['Id']]"
+					doc:name="store result in payload 'Id' field">
 					<sfdc:query-single config-ref="SalesforceB"
-						query="SELECT Id, Name, LastModifiedDate, interpreter__c, genre__c FROM MusicAlbum__c WHERE Name = '#[payload['Name']]'"
+						query="SELECT Id FROM MusicAlbum__c WHERE Name = '#[payload['Name']]'"
 						doc:name="query customObject in Salesforce instance B" />
 				</enricher>
-				<expression-component doc:name="remove Id from CustomObject"><![CDATA[// Remove ID from object as it is not valid to create an object with a predefined ID
-payload.remove('Id');]]></expression-component>
+
 			</batch:step>
 			<batch:step name="createCustomObjectsInBStep"
-				accept-expression="!(payload is NullPayload)">
-				<expression-component doc:name="prepare properties for upsert"><![CDATA[payload['Id'] = recordVars['customObjectInB'] is NullPayload ? null : recordVars['customObjectInB']['Id']
-payload.remove('type');
-payload.remove('LastModifiedDate');
+				accept-expression="payload != null">
 
-// TODO - Here you should remove all custom fields that don't exist in the target system and map the ones that vary in type/format
-payload.remove('year__c');]]></expression-component>
-				<logger message="CustomObject to create = #[payload]" level="ERROR"
-					doc:name="log CustomObject to create" />
 				<batch:commit size="200" doc:name="Batch Commit">
+                    <dw:transform-message doc:name="prepare customObjects for upsert">
+                        <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map {
+	Id: $.Id,
+	Name: $.Name,
+	interpreter__c: $.interpreter__c
+	// TODO - Here you should remove all custom fields that don't exist in the target system and map the ones that vary in type/format
+}
+]]></dw:set-payload>
+                    </dw:transform-message>
+                    <logger message="CustomObjects for upsert = #[payload]" level="INFO" doc:name="log CustomObjects for upsert"/>
 					<sfdc:upsert config-ref="SalesforceB" type="MusicAlbum__c"
 						doc:name="upsert CustomObjects in org B" externalIdFieldName="Id">
 						<sfdc:objects ref="#[payload]" />

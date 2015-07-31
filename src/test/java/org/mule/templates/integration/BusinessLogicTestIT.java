@@ -7,7 +7,6 @@
 package org.mule.templates.integration;
 
 import static junit.framework.Assert.assertEquals;
-
 import static org.mule.templates.builders.SfdcObjectBuilder.aCustomObject;
 
 import java.util.ArrayList;
@@ -202,6 +201,7 @@ public class BusinessLogicTestIT extends AbstractTemplateTestCase {
 		flow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testMainFlow() throws Exception {
 
