@@ -26,9 +26,9 @@ Note that using this template is subject to the conditions of this [License Agre
 Please review the terms of the license before downloading and using this template. In short, you are allowed to use the template for free with Mule ESB Enterprise Edition, CloudHub, or as a trial in Anypoint Studio.
 
 # Use Case <a name="usecase"/>
-As a Salesforce admin I want to migrate custom objects between two Salesfoce orgs.
+As a Salesforce admin I want to migrate custom objects between two Salesforce orgs.
 
-This Template should serve as a foundation for the process of migrating custom objects from one Salesfoce instance to another, being able to specify filtering criteria and desired behaviour when a custom object already exists in the destination org. 
+This Template should serve as a foundation for the process of migrating custom objects from one Salesforce instance to another, being able to specify filtering criteria and desired behaviour when a custom object already exists in the destination org. 
 
 As implemented, this Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
@@ -167,6 +167,7 @@ Mule Studio provides you with really easy way to deploy your Template directly t
 In order to use this Mule Anypoint Template you need to configure properties (Credentials, configurations, etc.) either in properties file or in CloudHub as Environment Variables. Detail list with examples:
 ### Application configuration
 + http.port `9090`
++ page.size `200`
 
 #### SalesForce Connector configuration for company A
 + sfdc.a.username `bob.dylan@orga`
@@ -180,7 +181,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + sfdc.b.securityToken `ces56arl7apQs56XTddf34X`
 + sfdc.b.url `https://login.salesforce.com/services/Soap/u/32.0`
 
-#### eMail Details
+#### Email Details
 + mail.from `batch.contact.migration%40mulesoft.com`
 + mail.to `your.username@youremaildomain.com`
 + mail.subject `Batch Job Finished Report`
