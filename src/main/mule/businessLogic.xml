@@ -11,26 +11,9 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8c32e813-82b9-416c-b91d-441765e09cce" >
-		<http:listener-connection host="0.0.0.0" port="${http.port}" />
-	</http:listener-config>
-	<salesforce:sfdc-config name="Salesforce_Sfdc_configA" doc:name="Salesforce Sfdc config" doc:id="e1501d69-64e5-4c89-9bdd-9afdc8153313" >
-		<salesforce:basic-connection username="${sfdc.a.username}" password="${sfdc.a.password}" securityToken="${sfdc.a.securityToken}" />
-	</salesforce:sfdc-config>
-	<salesforce:sfdc-config name="Salesforce_Sfdc_configB" doc:name="Salesforce Sfdc config" doc:id="776df715-7853-4aa0-85d6-cdacd81c6f53" >
-		<salesforce:basic-connection username="${sfdc.b.username}" password="${sfdc.b.password}" securityToken="${sfdc.b.securityToken}" />
-	</salesforce:sfdc-config>
-	<email:smtp-config name="Email_SMTPS" doc:name="Email SMTP" doc:id="efb4579d-b9fa-4f54-8036-2356f07b7ff4" >
-		<email:smtps-connection host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" tlsContext="TLS_Context" />
-	</email:smtp-config>
-	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="f2135468-7efa-4e92-a191-eaca88df39f2" >
-		<tls:trust-store insecure="true" />
-	</tls:context>
-	
-	<configuration-properties doc:name="Configuration properties" doc:id="7584fb1d-2fa2-445a-b949-eed01f5785bd" file="common.properties" />
-	<configuration-properties doc:name="Configuration properties" doc:id="86e0eb9d-cf2e-451a-9e09-b4afdf13e0e9" file="mule.dev.properties" />
-	<flow name="template-sfdc2sfdc-customobject-migrationFlow" doc:id="1ae8c770-cb85-4985-adbd-bd95e41c7be6" >
-		<http:listener doc:name="Start CustomObjects synchronization" doc:id="ca1efe4f-1e53-428a-b439-c1d905246a34" config-ref="HTTP_Listener_config" path="/migratecustomobjects"/>
+
+	<flow name="businessLogicFlow" doc:id="1ae8c770-cb85-4985-adbd-bd95e41c7be6" >
+		
 		<salesforce:query doc:name="Query CustomObjects from Salesforce instance A" doc:id="e9bd176e-400b-40ef-a018-7ae8d1b77765" config-ref="Salesforce_Sfdc_configA">
 			<salesforce:salesforce-query >SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c &gt; :year</salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output applicaton/java
@@ -39,7 +22,7 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 	"year" : 1968
 }]]]></salesforce:parameters>
 		</salesforce:query>
-		<batch:job jobName="template-sfdc2sfdc-customobject-migrationBatch_Job" doc:id="64a18748-28ff-49fc-9459-8847449a3057" >
+		<batch:job jobName="migrateCustomObjectsBatch" doc:id="64a18748-28ff-49fc-9459-8847449a3057" >
 			<batch:process-records >
 				<batch:step name="getCustomObjectInBStep" doc:id="83e36ee1-fa85-41b5-bf45-ef179401157b" >
 					<salesforce:query-single doc:name="Query customObject in Salesforce instance B" doc:id="90e78f6b-97b8-4284-adb2-8b65f6ac64a2" config-ref="Salesforce_Sfdc_configB" target="objectInB">
@@ -104,8 +87,14 @@ payload map {
 				</scatter-gather>
 			</batch:on-complete>
 		</batch:job>
-		<set-payload value="#['&lt;h1&gt;Batch Process initiated&lt;/h1&gt;&lt;b&gt;ID:&lt;/b&gt;' ++ payload.id ++ '&lt;br/&gt;&lt;b&gt;Records to Be Processed: &lt;/b&gt;' ++ payload.recordCount ++ '&lt;br/&gt; &lt;b&gt;Start execution on: &lt;/b&gt;' ++ now()]" doc:name="Set batch status to response" doc:id="bc5bdc70-89f4-4e51-97ed-09cf3122a005" mimeType="text/html"/>
+		
 	</flow>
-
-	
+	<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e" >
+		<flow-ref doc:name="businessLogicFlow" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0" name="businessLogicFlow"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71" type="ANY">
+				<flow-ref doc:name="errorHandlingFlow" doc:id="afdaf73c-0137-4d60-84f6-5c41234771a3" name="errorHandlingFlow" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
 </mule>

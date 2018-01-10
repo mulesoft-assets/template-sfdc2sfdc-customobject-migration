@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="triggerFlow" doc:id="25a15396-5def-4f1c-bac2-6c7a769f4278" >
+		<http:listener doc:name="Start CustomObjects synchronization" doc:id="ca1efe4f-1e53-428a-b439-c1d905246a34" config-ref="HTTP_Listener_config" path="/migratecustomobjects"/>
+		<flow-ref doc:name="mainFlow" doc:id="9c665dd4-7df3-4e0d-a1eb-01ac63781ce7" name="mainFlow"/>
+		<set-payload value="#['&lt;h1&gt;Batch Process initiated&lt;/h1&gt;&lt;b&gt;ID:&lt;/b&gt;' ++ payload.id ++ '&lt;br/&gt;&lt;b&gt;Records to Be Processed: &lt;/b&gt;' ++ payload.recordCount ++ '&lt;br/&gt; &lt;b&gt;Start execution on: &lt;/b&gt;' ++ now()]" doc:name="Set batch status to response" doc:id="bc5bdc70-89f4-4e51-97ed-09cf3122a005" mimeType="text/html"/>
+	</flow>
+</mule>
