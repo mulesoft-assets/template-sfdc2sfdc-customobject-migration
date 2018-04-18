@@ -25,7 +25,8 @@ The template is covered by the integration tests using the [MUnit](https://docs.
 		</section>
 		<section id="considerations">
 <![CDATA[
-To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both, that must be made in order for all to run smoothly. **Failling to do so could lead to unexpected behavior of the template.**
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both, that must be made in order for all to run smoothly. 
+**Failing to do so could lead to unexpected behavior of the template.**
 
 ## Create the Custom Object schemas in both organizations <a name="createcustomobjects" />
 
@@ -88,11 +89,11 @@ After this, to trigger the use case you just need to hit the local http endpoint
 		<![CDATA[
 Salesforce imposes limits on the number of API Calls that can be made. Therefore calculating this amount may be an important factor to consider. The Anypoint Template calls to the API can be calculated using the formula:
 
-***1 + X + X / {page.size}***
+***1 + X + X / ${page.size}***
 
 Being ***X*** the number of Custom Objects to be synchronized on each run. 
 
-The division by ***{page.size}*** is because, by default, Custom Objects are gathered in groups of {page.size} for each Upsert API Call in the commit step.
+The division by ***${page.size}*** is because, by default, Custom Objects are gathered in groups of ${page.size} for each Upsert API Call in the commit step.
 
 For instance if 10 records are fetched from origin instance, then 12 api calls will be made (1 + 10 + 1).
 ]]>
@@ -114,7 +115,6 @@ $H$H#  Inbound Flow
 		<![CDATA[
 Functional aspect of the Template is implemented on this XML, directed by one flow responsible of excecuting the logic.
 For the purpouse of this particular Template the *mainFlow* just excecutes the Batch Job which handles all the logic of it.
-This flow has Exception Handling that basically consists on invoking the *errorHandlingFlow* defined in *errorHandling.xml* file.
 ]]>
 		</section>
 	</sections>
