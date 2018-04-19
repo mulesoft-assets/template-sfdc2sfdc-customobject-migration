@@ -43,7 +43,7 @@ payload ++ vars.objectInB]]></ee:set-payload>
 					</ee:transform>
 				</batch:step>
 				<batch:step name="createCustomObjectsInBStep" doc:id="25002f0d-fefe-4b2a-b1e2-1518aea7929c" acceptExpression="payload != null">
-					<batch:aggregator doc:name="Batch Aggregator" doc:id="00d87943-9e0b-4f3d-a7e9-76d510d43b2d" size="200">
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="00d87943-9e0b-4f3d-a7e9-76d510d43b2d" size="${page.size}">
 						<ee:transform doc:name="Prepare customObjects for upsert" doc:id="dd0ea23c-ff0a-401a-bcc1-2a099bf71648" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
