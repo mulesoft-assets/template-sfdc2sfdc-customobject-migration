@@ -15,23 +15,53 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<configuration-properties doc:name="Configuration properties" doc:id="59fef852-f885-4b1e-baac-96bce830be9f" file="mule-artifact.properties" />
 	<configuration-properties doc:name="Configuration properties" doc:id="a0f29785-69a4-48b7-8ef5-410c95ee7ff2" file="common.properties" />
 	<munit:before-test name="test-suiteBefore_Test" description="Before tests actions" doc:id="7f8facb1-95ae-4456-9448-faf3a3a89dc9" >
+		<ee:transform doc:name="Prepare common testing data" doc:id="56fa411a-80a7-43b8-b8b6-1f1f45758545" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="testInterpreter1" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Interpreter: "test" ++ (uuid() splitBy("-"))[0] ++ "Interpreter",
+	Name: "test" ++ (uuid() splitBy("-"))[0] ++ "Name"
+}
+]]></ee:set-variable>
+				<ee:set-variable variableName="testInterpreter2" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Interpreter: "test" ++ (uuid() splitBy("-"))[0] ++ "Interpreter",
+	Name: "test" ++ (uuid() splitBy("-"))[0] ++ "Name"
+}
+]]></ee:set-variable>
+				<ee:set-variable variableName="testInterpreter3" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Interpreter: "test" ++ (uuid() splitBy("-"))[0] ++ "Interpreter",
+	Name: "test" ++ (uuid() splitBy("-"))[0] ++ "Name"
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<ee:transform doc:name="Prepare testing data in instance A" doc:id="7c253cc1-4a09-4e71-a9c5-74e5dbbf5848">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	Name: "testName1",
-	interpreter__c : "testInterpreter1",
+	Name: vars.testInterpreter1.Name,
+	interpreter__c : vars.testInterpreter1.Interpreter,
 	year__c: 1990
 },
 {
-	Name: "testName2",
-	interpreter__c : "testInterpreter2",
+	Name: vars.testInterpreter2.Name,
+	interpreter__c : vars.testInterpreter2.Interpreter,
 	year__c: 1960
 },
 {
-	Name: "testName3",
+	Name: vars.testInterpreter3.Name,
 	interpreter__c : "upTestInterpreter3",
 	year__c: 1998
 }
@@ -48,8 +78,8 @@ output application/java
 ---
 [
 {
-	Name: "testName3",
-	interpreter__c : "testInterpreter3",
+	Name: vars.testInterpreter3.Name,
+	interpreter__c : vars.testInterpreter3.Interpreter,
 	year__c: 1998
 }
 ]
@@ -73,7 +103,7 @@ output application/java
 				<salesforce:parameters ><![CDATA[#[output applicaton/java
 ---
 {
-	"name2" : "testName2"
+	"name2" : vars.testInterpreter2.Name
 }]]]></salesforce:parameters>
 			</salesforce:query>
 			<set-variable value="#[sizeOf(payload)]" doc:name=" Set Variable for assertion" doc:id="95c89be7-1756-40fd-b198-2b1334bf6979" variableName="resultSize"/>
@@ -83,7 +113,7 @@ output application/java
 				<salesforce:parameters ><![CDATA[#[output applicaton/java
 ---
 {
-	"name1" : "testName1"
+	"name1" : vars.testInterpreter1.Name
 }]]]></salesforce:parameters>
 			</salesforce:query>
 			<set-variable value="#[sizeOf(payload)]" doc:name="Set Variable with result size" doc:id="b485fb70-e4a8-4f97-9da9-e0ace1a236c9" variableName="resultSize" />
@@ -96,7 +126,7 @@ output application/java
 				<salesforce:parameters ><![CDATA[#[output applicaton/java
 ---
 {
-	"name3" : "testName3"
+	"name3" : vars.testInterpreter3.Name
 }]]]></salesforce:parameters>
 			</salesforce:query>
 			<set-variable value="#[sizeOf(payload)]" doc:name="Set Variable with result size" doc:id="a7d6e9a8-81c0-4712-920f-d8a72978e0e6" variableName="resultSize"/>
