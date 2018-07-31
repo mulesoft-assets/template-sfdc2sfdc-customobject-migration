@@ -75,12 +75,12 @@ payload map {
 							<email:body contentType="text/plain">
 								<email:content ><![CDATA[#["Migration Report: \n"
  
-++ "\n Time [milliseconds]: " 		++ payload.elapsedTimeInMillis
-++ "\n Total Records: "				++ payload.totalRecords
-++ "\n Successful Records: "		++ payload.successfulRecords
-++ "\n Failed Records: "			++ payload.failedRecords
-++ "\n Loaded Records: "			++ payload.loadedRecords
-++ "\n Processed Records: " 		++ payload.processedRecords]]]></email:content>
+++ "\n Time [milliseconds]: " 		++ payload.elapsedTimeInMillis!
+++ "\n Total Records: "				++ payload.totalRecords!
+++ "\n Successful Records: "		++ payload.successfulRecords!
+++ "\n Failed Records: "			++ payload.failedRecords!
+++ "\n Loaded Records: "			++ payload.loadedRecords!
+++ "\n Processed Records: " 		++ payload.processedRecords!]]]></email:content>
 							</email:body>
 						</email:send>
 					</route>
