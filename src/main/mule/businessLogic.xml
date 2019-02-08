@@ -13,15 +13,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
 	<flow name="businessLogicFlow" doc:id="1ae8c770-cb85-4985-adbd-bd95e41c7be6" >
-		
-		<salesforce:query doc:name="Query CustomObjects from Salesforce instance A" doc:id="e9bd176e-400b-40ef-a018-7ae8d1b77765" config-ref="Salesforce_Sfdc_configA">
-			<salesforce:salesforce-query >SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c &gt; :year</salesforce:salesforce-query>
-			<salesforce:parameters ><![CDATA[#[output applicaton/java
----
-{
-	"year" : 1968
-}]]]></salesforce:parameters>
-		</salesforce:query>
 		<batch:job jobName="migrateCustomObjectsBatch" doc:id="64a18748-28ff-49fc-9459-8847449a3057" >
 			<batch:process-records >
 				<batch:step name="getCustomObjectInBStep" doc:id="83e36ee1-fa85-41b5-bf45-ef179401157b" >
@@ -89,7 +80,18 @@ payload map {
 		</batch:job>
 		
 	</flow>
+	<sub-flow name="queryFlow" doc:id="abea5810-61e4-49bf-b16a-27cc81d42e26" >
+		<salesforce:query doc:name="Query CustomObjects from Salesforce instance A" doc:id="e9bd176e-400b-40ef-a018-7ae8d1b77765" config-ref="Salesforce_Sfdc_configA">
+			<salesforce:salesforce-query>SELECT Name, LastModifiedDate, interpreter__c, year__c FROM MusicAlbum__c WHERE year__c &gt; :year</salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"year" : 1968
+}]]]></salesforce:parameters>
+		</salesforce:query>
+	</sub-flow>
 	<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e" >
+		<flow-ref doc:name="queryFlow" doc:id="6424fee9-b4ea-4b7e-8404-36f49dced6bf" name="queryFlow"/>
 		<flow-ref doc:name="businessLogicFlow" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0" name="businessLogicFlow"/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71" type="ANY">
