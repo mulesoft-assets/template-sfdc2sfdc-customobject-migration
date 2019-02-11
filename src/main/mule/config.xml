@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
-			
+	<global-property doc:name="Global Property" name="mule.env" value="dev" />			
 	<http:listener-config name="HTTP_Listener_config" doc:id="8c32e813-82b9-416c-b91d-441765e09cce" doc:name="HTTP Listener config">
 		<http:listener-connection host="0.0.0.0" port="${http.port}" />
 	</http:listener-config>
@@ -19,5 +19,4 @@
 	</tls:context>
 	<configuration-properties file="common.properties" doc:id="7584fb1d-2fa2-445a-b949-eed01f5785bd" doc:name="Configuration properties" />
 	<configuration-properties file="mule.${mule.env}.properties" doc:id="86e0eb9d-cf2e-451a-9e09-b4afdf13e0e9" doc:name="Configuration properties" />
-	<configuration-properties file="mule-artifact.properties" doc:id="0abdf143-d5d1-4168-bdbd-7e3722442725" doc:name="Configuration properties" />
-<global-property doc:name="Global Property" name="mule.env" value="dev" /></mule>
+</mule>
